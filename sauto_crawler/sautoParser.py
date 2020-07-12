@@ -1,24 +1,15 @@
-import requests
 from bs4 import BeautifulSoup
 import re
-from selenium import webdriver
 
 """
-Crawler for used cars on www.sauto.cz.
+Parser for data crawled from sauto.cz
 """
 
-testUrl="https://www.sauto.cz/osobni/detail/ford/mondeo/18753802"
-
-baseSearchUrl="https://www.sauto.cz/osobni/hledani#!category=1&condition=1&condition=2&condition=4&priceMax=%s&tachometrMax=%s&yearMin=%s&page=%s"
-
-def downloadPage(url):
+def getDataHeaders():
 	"""
-	Use requests library to download given 
-	HTML page and return its' content.
+	Return data headers for csv files.
 	"""
-	r = requests.get(url)
-	print(r.url)
-	return r.text
+	return ["brand", "model", "price", "year", "kilometers", "power"]
 
 def extractValueFromParamTableHead(soup, valueName):
 	"""
@@ -31,14 +22,13 @@ def extractValueFromParamTableHead(soup, valueName):
 	paramTable = soup.find(id="detailParams")
 	if (paramTable is not None):
 		rows = paramTable.thead.find_all("tr")
-		if (len(rows) > 0):
-			for row in rows:
-				if (row.th.text == valueName):
-					return row.td.text.strip().replace("\xa0","")
+		for row in rows:
+			if (row.th.text == valueName):
+				return row.td.text.strip().replace("\xa0","")
 					
 	# nothing found
 	return None
-
+	
 def parseAdPage(pageContent):
 	"""
 	Use BeautifulSoup library to parse the HTML
@@ -94,47 +84,5 @@ def parseSearchListPage(pageContent):
 			adLinks.append(itemLink)
 	
 	return adLinks
-	
-
-def downloadSearchListPage(page, browser, priceMax=100000, tachometrMax=200000, yearMin=2000):
-	"""
-	Downloads the content of one search list page. Because the search list is fetched by JS, the
-	Selenium library is used to get it.
-	"""
-	url = baseSearchUrl % (priceMax, tachometrMax, yearMin, page)
-	print(url)
-	
-	browser.get(url)
-	return browser.page_source
-	
-def createHeadlessBrowser():
-	"""
-	Create and return instance of a Selenium headless browser.
-	"""
-	fireFoxOptions = webdriver.FirefoxOptions()
-	fireFoxOptions.headless = True
-	return webdriver.Firefox(options=fireFoxOptions)
-	
-def main():
-	#content = downloadPage(testUrl)
-	#extractedData = parseAdPage(content)
-	#print(extractedData)
-	
-	searchPage = ""
-	with open("crawled/search-1.html", "r") as file:
-		searchPage = file.read()
-	
-	if len(searchPage) == 0:
-		browser = createHeadlessBrowser()
-		searchPage = downloadSearchListPage(page=1, browser = browser)
-		with open('crawled/search-1.html', 'w') as file:
-			file.write(searchPage)
-	adLinks = parseSearchListPage(searchPage)
-	print(adLinks)
-	
-	# with open('crawled/test.html', 'w') as file:
-	# 	file.write(content)
-		
-main()
 	
 	
