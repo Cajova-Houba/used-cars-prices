@@ -1,5 +1,7 @@
 library("ggplot2")
 library("scatterplot3d")
+library("magrittr")
+library("dplyr")
 
 # load data
 carData = read.csv(file='data.csv')
@@ -109,3 +111,29 @@ boxplot(price ~ year,
         xlab="Manufactured", 
         ylab="Price [Kè]",
         main="Price by year (Ford)")
+
+boxplot(kilometers ~ year, 
+        data=carDataByBrand$Škoda, 
+        range=0, 
+        xlab="Manufactured", 
+        ylab="Kilometers",
+        main="Kilometers by year (Škoda)")
+
+boxplot(price ~ year,
+        data=carData,
+        range=0,
+        xlab="Manufactured",
+        ylab="Price [Kè]",
+        main="Price by year")
+
+year2000Data <- carData[which(carData$year == 2000),]
+
+mean(year2000Data$price)
+mean(year2000Data$kilometers)
+
+boxplot(kilometers ~ year, 
+        data=carData, 
+        range=0, 
+        xlab="Manufactured", 
+        ylab="Kilometers",
+        main="Kilometers by year")
