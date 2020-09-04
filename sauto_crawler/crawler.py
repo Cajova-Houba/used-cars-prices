@@ -15,8 +15,8 @@ Downloads 665 pages of search results to folder crawled_{timestamp}.
 25 + 665*15 = 10000
 By iterating over 665 pages we lose the last 15 results but who cares.
 """
-maxPage=2
-outFolderName="crawled"
+maxPage=3
+outFolderName="../crawled"
 
 baseSearchUrl="https://www.sauto.cz/osobni/hledani#!category=1&condition=1&condition=2&condition=4&priceMax=%s&tachometrMax=%s&yearMin=%s&page=%s"
 
