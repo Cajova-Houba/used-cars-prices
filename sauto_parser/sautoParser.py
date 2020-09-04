@@ -1,9 +1,58 @@
 from bs4 import BeautifulSoup
 import re
+import os
+import shutil
+import csv
 
 """
 Parser for data crawled from sauto.cz
 """
+
+# delimiter for the output csv
+outputDelimiter=","
+
+def parse(inputFolder):
+	"""Goes through the folder structure created by crawler and parses ad pages.
+
+	Args:
+		inputFolder (string): Input folder which should point to the folder with search and ad pages. E.g. crawled/{timestamp}
+	"""
+	print("Initializing output file")
+	initResultFile("data.csv")
+	processResultPages(inputFolder, "data.csv")
+
+
+def initResultFile(fileName):
+	"""
+	Initialize file to store extracted data in. Check that it
+	eixst or create it and add csv header.  
+	"""
+	if not os.path.isfile(fileName):
+		data = []
+		data.append(getDataHeaders())
+		saveDataToFile(fileName, data)
+
+def processResultPages(inDirName, outFileName):
+	print("Processing input folder: "+inDirName)
+	files = os.listdir(inDirName)
+	for f in files:
+		if not os.path.isfile(inDirName+"/"+f):
+			processResultPageFolder(inDirName+"/"+f, outFileName)
+	
+def processResultPageFolder(folderName, outFileName):
+	print("Processing folder "+folderName)
+	files = os.listdir(folderName)
+	data = []
+	for f in files:
+		if f.endswith(".html") and os.path.isfile(folderName+"/"+f):
+			print("Parsing page "+f)
+			with(open(folderName+"/"+f, "rb")) as adPage:
+				htmlContent = adPage.read().decode()
+			data.append(parseAdPage(htmlContent))
+	
+	print("Saving parsed data")
+	saveDataToFile(outFileName, data)
+	print("Done")
 
 def getDataHeaders():
 	"""
@@ -91,5 +140,23 @@ def parseSearchListPage(pageContent):
 			adLinks.append(itemLink)
 	
 	return adLinks
-	
-	
+
+def saveDataToFile(fileName, data):
+	"""Saves multiple lines to csv file.
+
+	Args:
+		fileName (string): Name of the outputfile to append data to.
+		data (array[][]): Array of array of data items (array of rows to save).
+	"""
+	with open(fileName, "ab") as file:
+		for dataLine in data:
+			lineStr = ""
+			for dataItem in dataLine:
+				lineStr = lineStr + dataItem + outputDelimiter
+			file.write((lineStr[:-1] + "\n").encode("utf8"))
+
+def main():
+	print("Parsin' baby!")
+	parse("../crawled/2020-09-04_18-27-42")
+
+main()
