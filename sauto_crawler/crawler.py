@@ -21,6 +21,9 @@ Downloads 665 pages of search results to folder crawled where it creates followi
 			...
 """
 
+# The output folder's name is the current date
+outputFolderNamePattern="%Y-%m-%d"
+
 #
 #10k results with the 1st page having 25 and others 15.
 #25 + 665*15 = 10000
@@ -54,7 +57,7 @@ def initOutputFolder():
 	folder already exists, it will be deleted.
 	Name is returned.
 	"""
-	timestampSuffix = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+	timestampSuffix = datetime.now().strftime(outputFolderNamePattern)
 	folderName = outFolderName + "/" + timestampSuffix
 	if os.path.exists(folderName):
 		shutil.rmtree(folderName)
