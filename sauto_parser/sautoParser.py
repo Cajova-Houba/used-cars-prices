@@ -3,6 +3,7 @@ import re
 import os
 import shutil
 import csv
+import sys
 
 """
 Parser for data crawled from sauto.cz
@@ -155,8 +156,21 @@ def saveDataToFile(fileName, data):
 				lineStr = lineStr + dataItem + outputDelimiter
 			file.write((lineStr[:-1] + "\n").encode("utf8"))
 
+def getDataDirectoryPath():
+	"""Obtains path to the data directory from the script arguments. It is expected that
+	the first argument is the path to the directory.
+	"""
+	if (len(sys.argv) < 2):
+		print("Path to the data directory expected to be the first argument.")
+		return None
+	else:
+		return sys.argv[1]
+
 def main():
 	print("Parsin' baby!")
-	parse("../crawled/2020-09-04_18-27-42")
+	dirPath = getDataDirectoryPath()
+	if (dirPath is None):
+		return 1
+	parse(dirPath)
 
 main()
